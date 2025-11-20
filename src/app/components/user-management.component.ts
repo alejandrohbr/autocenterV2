@@ -75,6 +75,9 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                     Rol
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    No Empleado
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Centro Automotriz
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -98,6 +101,9 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                     <span [class]="getRoleBadgeClass(user.role)">
                       {{getRoleLabel(user.role)}}
                     </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500">{{user.employee_number || '-'}}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm text-gray-500">{{user.autocenter || '-'}}</div>
@@ -179,6 +185,16 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                   minlength="6"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Empleado *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="formData.employee_number"
+                  name="employee_number"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
               </div>
 
               <div>
@@ -266,20 +282,21 @@ export class UserManagementComponent implements OnInit {
     password: string;
     role: UserRole | '';
     autocenter: string;
+    employee_number: string;
   } = {
     full_name: '',
     email: '',
     password: '',
     role: '',
-    autocenter: ''
+    autocenter: '',
+    employee_number: ''
   };
 
   roleLabels: Record<UserRole, string> = {
     'super_admin': 'Super Admin',
     'admin_corporativo': 'Admin Corporativo',
     'gerente': 'Gerente',
-    'tecnico': 'Técnico',
-    'asesor_tecnico': 'Asesor Técnico'
+    'asesor': 'Asesor'
   };
 
   constructor(public authService: AuthService, private router: Router) {}
@@ -317,14 +334,13 @@ export class UserManagementComponent implements OnInit {
     const managedRoles = [
       { value: 'admin_corporativo', label: 'Admin Corporativo' },
       { value: 'gerente', label: 'Gerente' },
-      { value: 'tecnico', label: 'Técnico' },
-      { value: 'asesor_tecnico', label: 'Asesor Técnico' }
+      { value: 'asesor', label: 'Asesor' }
     ];
 
     if (this.authService.isSuperAdmin()) {
       return managedRoles;
     } else if (this.authService.isAdminCorporativo()) {
-      return managedRoles.filter(r => ['gerente', 'tecnico', 'asesor_tecnico'].includes(r.value));
+      return managedRoles.filter(r => ['gerente', 'asesor'].includes(r.value));
     }
 
     return [];
@@ -337,11 +353,10 @@ export class UserManagementComponent implements OnInit {
   getRoleBadgeClass(role: UserRole): string {
     const baseClass = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full';
     const colorMap: Record<UserRole, string> = {
-      'super_admin': 'bg-purple-100 text-purple-800',
-      'admin_corporativo': 'bg-indigo-100 text-indigo-800',
-      'gerente': 'bg-blue-100 text-blue-800',
-      'tecnico': 'bg-green-100 text-green-800',
-      'asesor_tecnico': 'bg-yellow-100 text-yellow-800'
+      'super_admin': 'bg-red-100 text-red-800',
+      'admin_corporativo': 'bg-blue-100 text-blue-800',
+      'gerente': 'bg-green-100 text-green-800',
+      'asesor': 'bg-yellow-100 text-yellow-800'
     };
     return `${baseClass} ${colorMap[role] || 'bg-gray-100 text-gray-800'}`;
   }
@@ -357,7 +372,8 @@ export class UserManagementComponent implements OnInit {
       email: user.email,
       password: '',
       role: user.role,
-      autocenter: user.autocenter || ''
+      autocenter: user.autocenter || '',
+      employee_number: user.employee_number || ''
     };
     this.showCreateModal = true;
   }
@@ -370,7 +386,8 @@ export class UserManagementComponent implements OnInit {
       if (this.editingUser) {
         const updateData: any = {
           full_name: this.formData.full_name,
-          role: this.formData.role as UserRole
+          role: this.formData.role as UserRole,
+          employee_number: this.formData.employee_number
         };
         if (this.requiresAutocenter()) {
           updateData.autocenter = this.formData.autocenter;
@@ -394,7 +411,8 @@ export class UserManagementComponent implements OnInit {
           email: this.formData.email,
           password: this.formData.password,
           full_name: this.formData.full_name,
-          role: this.formData.role as UserRole
+          role: this.formData.role as UserRole,
+          employee_number: this.formData.employee_number
         };
         if (this.requiresAutocenter()) {
           userData.autocenter = this.formData.autocenter;
@@ -453,12 +471,13 @@ export class UserManagementComponent implements OnInit {
       email: '',
       password: '',
       role: '',
-      autocenter: ''
+      autocenter: '',
+      employee_number: ''
     };
   }
 
   requiresAutocenter(): boolean {
-    return ['tecnico', 'gerente', 'asesor_tecnico'].includes(this.formData.role);
+    return ['gerente', 'asesor'].includes(this.formData.role);
   }
 
   onRoleChange() {

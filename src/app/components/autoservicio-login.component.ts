@@ -17,7 +17,7 @@ export class AutoservicioLoginComponent {
     private authService: AuthService
   ) {}
 
-  tipoUsuario: string = 'tecnico';
+  tipoUsuario: string = 'asesor';
   username: string = '';
   password: string = '';
   errorMessage: string = '';
@@ -26,8 +26,7 @@ export class AutoservicioLoginComponent {
   tiposUsuario = [
     { value: 'admin_corporativo', text: 'Admin Corporativo' },
     { value: 'gerente', text: 'Gerente' },
-    { value: 'tecnico', text: 'Técnico' },
-    { value: 'asesor_tecnico', text: 'Asesor Técnico' }
+    { value: 'asesor', text: 'Asesor' }
   ];
 
   goBack() {
@@ -81,8 +80,7 @@ export class AutoservicioLoginComponent {
       'super_admin': 'Super Admin',
       'admin_corporativo': 'Admin Corporativo',
       'gerente': 'Gerente',
-      'tecnico': 'Técnico',
-      'asesor_tecnico': 'Asesor Técnico'
+      'asesor': 'Asesor'
     };
     return labels[role] || role;
   }

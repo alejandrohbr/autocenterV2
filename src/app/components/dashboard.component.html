@@ -12,10 +12,9 @@
               <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
                     [ngClass]="{
                       'bg-purple-100 text-purple-700': auth.isSuperAdmin(),
-                      'bg-indigo-100 text-indigo-700': auth.isAdminCorporativo(),
-                      'bg-cyan-100 text-cyan-700': auth.isGerente(),
-                      'bg-green-100 text-green-700': auth.isTecnico(),
-                      'bg-yellow-100 text-yellow-700': auth.isAsesorTecnico()
+                      'bg-blue-100 text-blue-700': auth.isAdminCorporativo(),
+                      'bg-green-100 text-green-700': auth.isGerente(),
+                      'bg-yellow-100 text-yellow-700': auth.isAsesor()
                     }">
                 {{ getRoleLabel() }}
               </span>
