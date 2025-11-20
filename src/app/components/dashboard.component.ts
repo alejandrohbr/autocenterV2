@@ -354,7 +354,8 @@ export class DashboardComponent implements OnInit {
     if (this.auth.isSuperAdmin()) return 'Super Admin';
     if (this.auth.isAdminCorporativo()) return 'Admin Corporativo';
     if (this.auth.isGerente()) return 'Gerente';
-    if (this.auth.isAsesor()) return 'Asesor';
+    if (this.auth.isTecnico()) return 'Técnico';
+    if (this.auth.isAsesorTecnico()) return 'Asesor Técnico';
     return 'Usuario';
   }
 
@@ -2131,7 +2132,8 @@ export class DashboardComponent implements OnInit {
     // Debe estar pendiente de aprobación
     if (order.admin_validation_status !== 'pending') return false;
 
-    return this.auth.isAsesor();
+    // Solo para Técnico y Asesor Técnico
+    return this.auth.isTecnico() || this.auth.isAsesorTecnico();
   }
 
   async processProducts(order: Order) {

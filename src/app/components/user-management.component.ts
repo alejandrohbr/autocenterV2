@@ -75,9 +75,6 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                     Rol
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    No Empleado
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Centro Automotriz
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -101,9 +98,6 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                     <span [class]="getRoleBadgeClass(user.role)">
                       {{getRoleLabel(user.role)}}
                     </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-500">{{user.employee_number || '-'}}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm text-gray-500">{{user.autocenter || '-'}}</div>
@@ -202,15 +196,6 @@ import { AuthService, User, UserRole } from '../services/auth.service';
                 </select>
               </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Empleado</label>
-                <input
-                  type="text"
-                  [(ngModel)]="formData.employee_number"
-                  name="employee_number"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-
               <div *ngIf="requiresAutocenter()">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Centro Automotriz *</label>
                 <select
@@ -281,21 +266,20 @@ export class UserManagementComponent implements OnInit {
     password: string;
     role: UserRole | '';
     autocenter: string;
-    employee_number: string;
   } = {
     full_name: '',
     email: '',
     password: '',
     role: '',
-    autocenter: '',
-    employee_number: ''
+    autocenter: ''
   };
 
   roleLabels: Record<UserRole, string> = {
     'super_admin': 'Super Admin',
     'admin_corporativo': 'Admin Corporativo',
     'gerente': 'Gerente',
-    'asesor': 'Asesor'
+    'tecnico': 'Técnico',
+    'asesor_tecnico': 'Asesor Técnico'
   };
 
   constructor(public authService: AuthService, private router: Router) {}
@@ -333,13 +317,14 @@ export class UserManagementComponent implements OnInit {
     const managedRoles = [
       { value: 'admin_corporativo', label: 'Admin Corporativo' },
       { value: 'gerente', label: 'Gerente' },
-      { value: 'asesor', label: 'Asesor' }
+      { value: 'tecnico', label: 'Técnico' },
+      { value: 'asesor_tecnico', label: 'Asesor Técnico' }
     ];
 
     if (this.authService.isSuperAdmin()) {
       return managedRoles;
     } else if (this.authService.isAdminCorporativo()) {
-      return managedRoles.filter(r => ['gerente', 'asesor'].includes(r.value));
+      return managedRoles.filter(r => ['gerente', 'tecnico', 'asesor_tecnico'].includes(r.value));
     }
 
     return [];
@@ -352,10 +337,11 @@ export class UserManagementComponent implements OnInit {
   getRoleBadgeClass(role: UserRole): string {
     const baseClass = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full';
     const colorMap: Record<UserRole, string> = {
-      'super_admin': 'bg-red-100 text-red-800',
-      'admin_corporativo': 'bg-blue-100 text-blue-800',
-      'gerente': 'bg-green-100 text-green-800',
-      'asesor': 'bg-yellow-100 text-yellow-800'
+      'super_admin': 'bg-purple-100 text-purple-800',
+      'admin_corporativo': 'bg-indigo-100 text-indigo-800',
+      'gerente': 'bg-blue-100 text-blue-800',
+      'tecnico': 'bg-green-100 text-green-800',
+      'asesor_tecnico': 'bg-yellow-100 text-yellow-800'
     };
     return `${baseClass} ${colorMap[role] || 'bg-gray-100 text-gray-800'}`;
   }
@@ -371,8 +357,7 @@ export class UserManagementComponent implements OnInit {
       email: user.email,
       password: '',
       role: user.role,
-      autocenter: user.autocenter || '',
-      employee_number: user.employee_number || ''
+      autocenter: user.autocenter || ''
     };
     this.showCreateModal = true;
   }
@@ -387,9 +372,6 @@ export class UserManagementComponent implements OnInit {
           full_name: this.formData.full_name,
           role: this.formData.role as UserRole
         };
-        if (this.formData.employee_number) {
-          updateData.employee_number = this.formData.employee_number;
-        }
         if (this.requiresAutocenter()) {
           updateData.autocenter = this.formData.autocenter;
         }
@@ -414,9 +396,6 @@ export class UserManagementComponent implements OnInit {
           full_name: this.formData.full_name,
           role: this.formData.role as UserRole
         };
-        if (this.formData.employee_number) {
-          userData.employee_number = this.formData.employee_number;
-        }
         if (this.requiresAutocenter()) {
           userData.autocenter = this.formData.autocenter;
         }
@@ -474,13 +453,12 @@ export class UserManagementComponent implements OnInit {
       email: '',
       password: '',
       role: '',
-      autocenter: '',
-      employee_number: ''
+      autocenter: ''
     };
   }
 
   requiresAutocenter(): boolean {
-    return ['gerente', 'asesor'].includes(this.formData.role);
+    return ['tecnico', 'gerente', 'asesor_tecnico'].includes(this.formData.role);
   }
 
   onRoleChange() {

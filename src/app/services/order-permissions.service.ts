@@ -60,19 +60,19 @@ export class OrderPermissionsService {
   private getPhaseConfig(phase: OrderPhase): Omit<PhasePermissions, 'canView' | 'canAdvance' | 'canEdit'> {
     const configs: Record<OrderPhase, Omit<PhasePermissions, 'canView' | 'canAdvance' | 'canEdit'>> = {
       'diagnostico': {
-        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor'],
+        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor_tecnico', 'tecnico'],
         description: 'Crear diagnóstico inicial del vehículo'
       },
       'autorizacion_cliente': {
-        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor'],
+        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor_tecnico', 'tecnico'],
         description: 'Cliente autoriza el presupuesto'
       },
       'cargar_xml': {
-        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor'],
+        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor_tecnico'],
         description: 'Cargar XML de facturas'
       },
       'clasificar_productos': {
-        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor'],
+        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor_tecnico'],
         description: 'Clasificar productos del XML'
       },
       'validar_productos': {
@@ -96,7 +96,7 @@ export class OrderPermissionsService {
         description: 'Generar orden de compra'
       },
       'entregar': {
-        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor'],
+        allowedRoles: ['super_admin', 'admin_corporativo', 'gerente', 'asesor_tecnico', 'tecnico'],
         description: 'Entregar orden al cliente'
       }
     };
@@ -119,11 +119,16 @@ export class OrderPermissionsService {
       'super_admin': [] as OrderPhase[], // Ya retorna true arriba
       'admin_corporativo': [] as OrderPhase[], // Ya retorna true arriba
       'gerente': [] as OrderPhase[], // Ya retorna true arriba
-      'asesor': [
+      'asesor_tecnico': [
         'diagnostico',
         'autorizacion_cliente',
         'cargar_xml',
         'clasificar_productos',
+        'entregar'
+      ],
+      'tecnico': [
+        'diagnostico',
+        'autorizacion_cliente',
         'entregar'
       ]
     };

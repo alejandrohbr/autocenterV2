@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from './supabase.service';
 
-export type UserRole = 'super_admin' | 'admin_corporativo' | 'gerente' | 'asesor';
+export type UserRole = 'super_admin' | 'admin_corporativo' | 'gerente' | 'tecnico' | 'asesor_tecnico';
 
 export interface User {
   id: string;
@@ -12,7 +12,6 @@ export interface User {
   role: UserRole;
   is_active: boolean;
   autocenter?: string;
-  employee_number?: string;
   created_at?: Date;
   updated_at?: Date;
   last_login?: Date;
@@ -132,7 +131,6 @@ export class AuthService {
         role: profile.role,
         is_active: profile.is_active,
         autocenter: profile.autocenter,
-        employee_number: profile.employee_number,
         last_login: profile.last_login,
         created_at: profile.created_at,
         updated_at: profile.updated_at,
@@ -167,7 +165,6 @@ export class AuthService {
         role: profile.role,
         is_active: profile.is_active,
         autocenter: profile.autocenter,
-        employee_number: profile.employee_number,
         last_login: profile.last_login,
         created_at: profile.created_at,
         updated_at: profile.updated_at,
@@ -242,8 +239,12 @@ export class AuthService {
     return this.currentUser?.role === 'gerente' && this.currentUser?.is_active === true;
   }
 
-  isAsesor(): boolean {
-    return this.currentUser?.role === 'asesor' && this.currentUser?.is_active === true;
+  isTecnico(): boolean {
+    return this.currentUser?.role === 'tecnico' && this.currentUser?.is_active === true;
+  }
+
+  isAsesorTecnico(): boolean {
+    return this.currentUser?.role === 'asesor_tecnico' && this.currentUser?.is_active === true;
   }
 
   canManageUsers(): boolean {
@@ -263,13 +264,15 @@ export class AuthService {
   }
 
   canAdvanceOrderStatus(): boolean {
-    return this.isGerente() || this.isAsesor() || this.isAdminCorporativo() || this.isSuperAdmin();
+    // Solo gerente, asesor técnico, admin corporativo y super admin pueden avanzar estados
+    // Los técnicos NO pueden
+    return this.isGerente() || this.isAsesorTecnico() || this.isAdminCorporativo() || this.isSuperAdmin();
   }
 
   canManageRole(targetRole: UserRole): boolean {
     if (this.isSuperAdmin()) return true;
     if (this.isAdminCorporativo()) {
-      return ['gerente', 'asesor'].includes(targetRole);
+      return ['gerente', 'tecnico', 'asesor_tecnico'].includes(targetRole);
     }
     return false;
   }
@@ -291,7 +294,7 @@ export class AuthService {
     }
   }
 
-  async createUser(userData: { email: string; password: string; full_name: string; role: UserRole; autocenter?: string; employee_number?: string }): Promise<{ success: boolean; message?: string; user?: any }> {
+  async createUser(userData: { email: string; password: string; full_name: string; role: UserRole; autocenter?: string }): Promise<{ success: boolean; message?: string; user?: any }> {
     if (!this.canManageUsers()) {
       return { success: false, message: 'No tienes permisos para crear usuarios' };
     }
@@ -316,7 +319,6 @@ export class AuthService {
           full_name: userData.full_name,
           role: userData.role,
           autocenter: userData.autocenter,
-          employee_number: userData.employee_number,
           created_by: this.currentUser?.id
         })
       });

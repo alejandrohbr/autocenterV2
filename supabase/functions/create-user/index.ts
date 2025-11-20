@@ -20,7 +20,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { email, password, full_name, role, created_by, autocenter, employee_number } = await req.json();
+    const { email, password, full_name, role, created_by, autocenter } = await req.json();
 
     if (!email || !password || !full_name || !role) {
       return new Response(
@@ -77,11 +77,8 @@ Deno.serve(async (req: Request) => {
       created_by,
     };
 
-    if (employee_number) {
-      profileData.employee_number = employee_number;
-    }
-
-    if (['gerente', 'asesor'].includes(role) && autocenter) {
+    // Solo agregar autocenter si el rol lo requiere
+    if (['tecnico', 'gerente', 'asesor_tecnico'].includes(role) && autocenter) {
       profileData.autocenter = autocenter;
     }
 
